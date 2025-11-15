@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Francis&Co-Perfumes — Decants 5ml / 10ml</title>
+  <style>
+    :root{--accent:#304FFE;--muted:#6b7280}
+    *{box-sizing:border-box}
+    body{font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; margin:0;background:#f7f9fc;color:#0f172a}
+
+    /* HEADER */
+    header{
+      background:linear-gradient(90deg, #ffffff, #f1f5f9);
+      border-bottom:1px solid #e6eef8;
+      padding:18px 24px;
+      display:flex;
+      align-items:center;
+      justify-content:flex-start;
+      gap:15px;
+    }
+    .logo-img{
+      width:52px;
+      height:52px;
+      border-radius:10px;
+      object-fit:cover;
+    }
+
+    main{padding:24px;max-width:1100px;margin:24px auto}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:18px}
+    .card{background:#fff;border-radius:12px;padding:14px;box-shadow:0 6px 18px rgba(15,23,42,0.06);display:flex;flex-direction:column}
+    .product-img{height:180px;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden}
+    .product-img img{width:100%;height:100%;object-fit:cover;border-radius:8px}
+    h1{font-size:20px;margin:0}
+    p.lead{color:var(--muted);margin:6px 0 14px}
+    .options{margin-top:auto}
+    select{padding:8px;border-radius:8px;border:1px solid #e6eef8;width:100%}
+    button.add{margin-top:10px;background:var(--accent);color:#fff;border:0;padding:10px;border-radius:10px;width:100%;font-weight:600;cursor:pointer}
+
+    /* CARRITO */
+    .cart{
+      position:fixed;
+      right:12px;
+      bottom:12px;
+      background:#fff;
+      padding:10px;
+      border-radius:10px;
+      box-shadow:0 6px 20px rgba(15,23,42,0.12);
+      width:250px;
+      max-width:90vw;
+      transform: scale(0.9);
+    }
+    .cart h3{margin:0 0 8px;font-size:16px}
+    .cart-list{max-height:200px;overflow:auto;margin:8px 0}
+    .cart-item{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed #e5e7eb;font-size:14px}
+
+    .checkout{display:flex;gap:6px;margin-top:8px}
+    .btn{flex:1;padding:8px;border-radius:8px;border:0;cursor:pointer;font-size:12px}
+    .btn.checkout{background:#00b894;color:#fff}
+    .btn.clear{background:#f1f5f9;color:#0f172a;font-size:12px;padding:6px}
+
+    footer{text-align:center;color:var(--muted);font-size:13px;margin-top:40px;padding-bottom:20px}
+  </style>
+</head>
+<body>
+
+<header>
+  <img src="MI-LOGO.png" class="logo-img" alt="Logo">
+  <h1>Francis&Co-Perfumes</h1>
+</header>
+
+<main>
+  <h2>Perfumes disponibles</h2>
+  <div class="grid" id="productGrid"></div>
+</main>
+
+<div class="cart" id="cartBox">
+  <h3>Carrito</h3>
+  <div class="cart-list" id="cartList"></div>
+  <div class="checkout">
+    <button class="btn clear" id="clearCart">Limpiar</button>
+    <button class="btn checkout" id="checkoutBtn">Pagar en WhatsApp</button>
+  </div>
+</div>
+
+<footer>
+  Contacto WhatsApp: <b>5584586088</b>
+</footer>
+
+<script>
+const products = [
+  { name: "El Khadlaj Island", img: "isla-isla.png", price5: 120, price10: 220 },
+  { name: "TAG Him Armaf", img: "taghim.jpg", price5: 100, price10: 180 },
+  { name: "Bleu Glacial L'bel", img: "bleu.jpg", price5: 90, price10: 160 },
+  { name: "Yara Lattafa", img: "yara.jpg", price5: 80, price10: 150 },
+  { name: "Club de Nuit Precieux", img: "club.jpg", price5: 160, price10: 260 }
+];
+
+let cart = [];
+
+const grid = document.getElementById("productGrid");
+
+products.forEach((p, i) => {
+  const card = document.createElement("div");
+  card.className = "card";
+  card.innerHTML = `
+    <div class="product-img"><img src="${p.img}" alt="${p.name}"></div>
+    <h3>${p.name}</h3>
+    <p class="lead">Decants 5ml / 10ml</p>
+    <div class="options">
+      <select id="size-${i}">
+        <option value="5">5 ml — $${p.price5}</option>
+        <option value="10">10 ml — $${p.price10}</option>
+      </select>
+      <button class="add" onclick="addToCart(${i})">Agregar</button>
+    </div>
+  `;
+  grid.appendChild(card);
+});
+
+function addToCart(index){
+  const size = document.getElementById(`size-${index}`).value;
+  const product = products[index];
+  const price = size === "5" ? product.price5 : product.price10;
+  cart.push({ name: product.name, size, price });
+  updateCart();
+}
+
+function updateCart(){
+  const list = document.getElementById("cartList");
+  list.innerHTML = "";
+
+  cart.forEach(item =>{
+    const div = document.createElement("div");
+    div.className = "cart-item";
+    div.innerHTML = `${item.name} ${item.size}ml <b>$${item.price}</b>`;
+    list.appendChild(div);
+  });
+}
+
+document.getElementById("clearCart").addEventListener("click", () => {
+  cart = [];
+  updateCart();
+});
+
+document.getElementById("checkoutBtn").addEventListener("click", () => {
+  if(cart.length === 0) return alert("Tu carrito está vacío");
+
+  let msg = "Hola, quiero comprar estos decants:%0A";
+  cart.forEach(c =>{
+    msg += `• ${c.name} ${c.size}ml — $${c.price}%0A`;
+  });
+
+  window.open(`https://wa.me/525584586088?text=${msg}`);
+});
+</script>
+
+</body>
+</html>
